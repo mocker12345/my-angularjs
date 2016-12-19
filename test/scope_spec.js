@@ -125,5 +125,41 @@ describe("Scope", function () {
       })).toThrow();
     });
 
+    it("compare base on value if enabled", function () {
+      scope.aValue = [1, 2, 3];
+      scope.counter = 0;
+
+      scope.$watch(function () {
+        return scope.aValue;
+      }, function (newVal, oldVal, scope) {
+        scope.counter++;
+      }, true);
+
+      scope.$digest();
+
+      expect(scope.counter).toBe(1);
+
+      scope.aValue.push(4);
+      scope.$digest();
+
+      expect(scope.counter).toBe(2);
+
+
+    });
+
+    it("correctly handles NaNs", function () {
+      scope.number = 0 / 0;
+      scope.counter = 0;
+      scope.$watch(function () {
+        return scope.number;
+      }, function (newVal, oldVal, scope) {
+        scope.counter++
+      });
+      scope.$digest();
+      expect(scope.counter).toBe(1);
+      scope.$digest();
+      expect(scope.counter).toBe(1);
+    })
+
   })
 });
