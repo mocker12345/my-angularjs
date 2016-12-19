@@ -21,13 +21,14 @@ function initWatchVal() {
  * @param watchFn
  * @param listenerFn
  */
-Scope.prototype.$watch = function (watchFn, listenerFn) {
+Scope.prototype.$watch = function (watchFn, listenerFn, valueEq) {
   var watcher = {
     watchFn: watchFn,
     listenerFn: listenerFn || function () {
 
     },
-    last: initWatchVal
+    last: initWatchVal,
+    valueEq: !!valueEq
   };
   this.$$watchers.push(watcher);
   this.$$lastDirtyWatch = null;
@@ -58,9 +59,9 @@ Scope.prototype.$$digestOnce = function () {
   _.forEach(this.$$watchers, function (watcher) {
     newVal = watcher.watchFn(self);
     oldVal = watcher.last;
-    if (newVal !== oldVal) {
+    if (!self.$$areEqual(newVal,oldVal,watcher.valueEq)) {
       self.$$lastDirtyWatch = watcher;
-      watcher.last = newVal;
+      watcher.last = watcher.valueEq?_.cloneDeep(newVal):newVal;
       watcher.listenerFn(newVal, oldVal === initWatchVal ? newVal : oldVal, self);
       dirty = true;
     } else if (self.$$lastDirtyWatch === watcher) {
@@ -68,4 +69,12 @@ Scope.prototype.$$digestOnce = function () {
     }
   });
   return dirty;
+};
+ 
+Scope.prototype.$$areEqual = function (newVal,oldVal,valueEq) {
+  if (valueEq) {
+    return _.isEqual(newVal,oldVal);
+  }else {
+    return newVal === oldVal || (typeof newVal === 'number' && typeof oldVal === 'number' && isNaN(newVal) && isNaN(oldVal));
+  }
 };
