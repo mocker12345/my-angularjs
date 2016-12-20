@@ -70,6 +70,10 @@ Scope.prototype.$$digestOnce = function () {
   });
   return dirty;
 };
+
+Scope.prototype.$eval = function (expr,locals) {
+  return expr(this,locals);
+};
  
 Scope.prototype.$$areEqual = function (newVal,oldVal,valueEq) {
   if (valueEq) {
