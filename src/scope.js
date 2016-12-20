@@ -9,6 +9,8 @@ function Scope() {
   this.$$watchers = [];
   //标示最后一个脏值watch，减短digest loop
   this.$$lastDirtyWatch = null;
+  this.$$asyncQueue = [];
+  this.$$phase = null;
 }
 /**
  * 初始化watch值
@@ -41,12 +43,19 @@ Scope.prototype.$digest = function () {
   var ttl = 10;
   var dirty;
   this.$$lastDirtyWatch = null;
+  this.$beginPhase("$digest");
   do {
+    while (this.$$asyncQueue.length) {
+      var asyncTask = this.$$asyncQueue.shift();
+      asyncTask.scope.$eval(asyncTask.expression);
+    }
     dirty = this.$$digestOnce();
-    if (dirty && !(ttl--)) {
+    if ((dirty || this.$$asyncQueue.length) && !(ttl--)) {
+      this.$clearPhase();
       throw "10 digest iterations reached";
     }
-  } while (dirty);
+  } while (dirty || this.$$asyncQueue.length);
+  this.$clearPhase();
 };
 
 /**
@@ -59,9 +68,9 @@ Scope.prototype.$$digestOnce = function () {
   _.forEach(this.$$watchers, function (watcher) {
     newVal = watcher.watchFn(self);
     oldVal = watcher.last;
-    if (!self.$$areEqual(newVal,oldVal,watcher.valueEq)) {
+    if (!self.$$areEqual(newVal, oldVal, watcher.valueEq)) {
       self.$$lastDirtyWatch = watcher;
-      watcher.last = watcher.valueEq?_.cloneDeep(newVal):newVal;
+      watcher.last = watcher.valueEq ? _.cloneDeep(newVal) : newVal;
       watcher.listenerFn(newVal, oldVal === initWatchVal ? newVal : oldVal, self);
       dirty = true;
     } else if (self.$$lastDirtyWatch === watcher) {
@@ -71,14 +80,39 @@ Scope.prototype.$$digestOnce = function () {
   return dirty;
 };
 
-Scope.prototype.$eval = function (expr,locals) {
-  return expr(this,locals);
+Scope.prototype.$eval = function (expr, locals) {
+  return expr(this, locals);
 };
- 
-Scope.prototype.$$areEqual = function (newVal,oldVal,valueEq) {
+
+Scope.prototype.$evalAsync = function (expr) {
+  this.$$asyncQueue.push({scope: this, expression: expr});
+};
+
+Scope.prototype.$apply = function (expr) {
+  try {
+    this.$beginPhase("$apply");
+    return this.$eval(expr);
+  } finally {
+    this.$clearPhase();
+    this.$digest();
+  }
+};
+
+Scope.prototype.$$areEqual = function (newVal, oldVal, valueEq) {
   if (valueEq) {
-    return _.isEqual(newVal,oldVal);
-  }else {
+    return _.isEqual(newVal, oldVal);
+  } else {
     return newVal === oldVal || (typeof newVal === 'number' && typeof oldVal === 'number' && isNaN(newVal) && isNaN(oldVal));
   }
+};
+
+Scope.prototype.$beginPhase = function (phase) {
+  if (this.$$phase) {
+    throw this.$$phase + "already in progress.";
+  }
+  this.$$phase = phase;
+};
+
+Scope.prototype.$clearPhase = function () {
+  this.$$phase = null;
 };
