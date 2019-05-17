@@ -7,7 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +25,8 @@
     "grunt-contrib-testem": "^0.5.22",
     "jquery": "^3.1.1",
     "lodash": "^4.17.2",
-    "sinon": "^1.17.6"
-  }
+    "sinon": "^1.17.6",
+    "snyk": "^1.165.0"
+  },
+  "snyk": true
 }
