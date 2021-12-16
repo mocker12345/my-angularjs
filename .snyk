@@ -1,0 +1,42 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.22.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:debug:20170905':
+    - grunt-contrib-testem > testem > socket.io > debug:
+        patched: '2021-12-16T11:52:58.711Z'
+  'npm:engine.io-client:20160426':
+    - grunt-contrib-testem > testem > socket.io > socket.io-client > engine.io-client:
+        patched: '2021-12-16T11:52:58.711Z'
+  'npm:mime:20170907':
+    - grunt-contrib-testem > connect > send > mime:
+        patched: '2021-12-16T11:52:58.711Z'
+  'npm:minimatch:20160620':
+    - grunt-contrib-testem > testem > fileset > glob > minimatch:
+        patched: '2021-12-16T11:52:58.711Z'
+    - grunt-contrib-testem > testem > tap > glob > minimatch:
+        patched: '2021-12-16T11:52:58.711Z'
+    - grunt-contrib-testem > testem > fileset > minimatch:
+        patched: '2021-12-16T11:52:58.711Z'
+    - grunt-contrib-testem > testem > fireworm > minimatch:
+        patched: '2021-12-16T11:52:58.711Z'
+    - grunt-contrib-testem > testem > glob > minimatch:
+        patched: '2021-12-16T11:52:58.711Z'
+  'npm:ms:20151024':
+    - grunt-contrib-testem > testem > socket.io > debug > ms:
+        patched: '2021-12-16T11:52:58.711Z'
+    - grunt-contrib-testem > testem > socket.io > engine.io > debug > ms:
+        patched: '2021-12-16T11:52:58.711Z'
+    - grunt-contrib-testem > testem > socket.io > socket.io-adapter > debug > ms:
+        patched: '2021-12-16T11:52:58.711Z'
+    - grunt-contrib-testem > testem > socket.io > socket.io-client > engine.io-client > debug > ms:
+        patched: '2021-12-16T11:52:58.711Z'
+  'npm:qs:20140806-1':
+    - grunt-contrib-testem > connect > qs:
+        patched: '2021-12-16T11:52:58.711Z'
+  'npm:ws:20160920':
+    - grunt-contrib-testem > testem > socket.io > engine.io > ws:
+        patched: '2021-12-16T11:52:58.711Z'
+    - grunt-contrib-testem > testem > socket.io > socket.io-client > engine.io-client > ws:
+        patched: '2021-12-16T11:52:58.711Z'
